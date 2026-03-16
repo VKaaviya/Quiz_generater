@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peblo — Learn Smarter</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f4f2ee; --bg2:#fff; --bg3:#ede9e0; --accent:#ff6b35; --accent2:#ff8c5a;
+  --blue:#3b82f6; --green:#22c55e; --red:#ef4444; --amber:#f59e0b; --purple:#8b5cf6;
+  --text:#1a1a1a; --text2:#5a5a5a; --text3:#9a9a9a; --border:#e0dbd0;
+  --shadow:0 2px 16px rgba(0,0,0,0.08); --shadow-lg:0 8px 40px rgba(0,0,0,0.12);
+  --r:16px; --r-sm:10px; --font:'Nunito',sans-serif; --font2:'Nunito Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;}
+
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ── SCREEN 1: UPLOAD ── */
+#screen-upload{align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+#screen-upload::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(255,107,53,0.12) 0%,transparent 70%);pointer-events:none;}
+.upload-wrap{width:100%;max-width:520px;position:relative;z-index:1;animation:slideUp .6s ease forwards;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.logo-wrap{text-align:center;margin-bottom:2.5rem;}
+.logo-mark{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:var(--accent);border-radius:18px;margin-bottom:12px;box-shadow:0 8px 24px rgba(255,107,53,0.35);}
+.logo-mark svg{width:34px;height:34px;fill:none;stroke:white;stroke-width:2;}
+.logo-name{font-size:32px;font-weight:900;color:var(--text);letter-spacing:-1px;}
+.logo-tagline{font-size:15px;color:var(--text2);margin-top:4px;font-family:var(--font2);}
+.upload-card{background:var(--bg2);border-radius:24px;padding:2.5rem;box-shadow:var(--shadow-lg);border:1px solid var(--border);}
+.upload-card h2{font-size:22px;font-weight:800;margin-bottom:6px;}
+.upload-card p{font-size:14px;color:var(--text2);font-family:var(--font2);margin-bottom:1.75rem;}
+.name-row{margin-bottom:1rem;}
+.name-row input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:var(--r-sm);font-family:var(--font);font-size:15px;font-weight:600;outline:none;transition:border-color .2s;background:var(--bg);}
+.name-row input:focus{border-color:var(--accent);}
+.drop-zone{border:2.5px dashed var(--border);border-radius:var(--r);padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);margin-bottom:1.25rem;}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(255,107,53,0.04);}
+.drop-icon{width:52px;height:52px;background:rgba(255,107,53,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.drop-icon svg{width:26px;height:26px;stroke:var(--accent);fill:none;stroke-width:2;}
+.drop-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.drop-sub{font-size:13px;color:var(--text3);font-family:var(--font2);}
+.drop-sub span{color:var(--accent);font-weight:600;cursor:pointer;}
+.file-chosen{display:none;align-items:center;gap:10px;background:rgba(34,197,94,0.08);border:1.5px solid rgba(34,197,94,0.3);border-radius:var(--r-sm);padding:10px 14px;font-size:14px;font-weight:600;color:#166534;margin-bottom:1.25rem;}
+.file-chosen.show{display:flex;}
+.file-chosen svg{width:18px;height:18px;flex-shrink:0;}
+#fileInput{display:none;}
+.btn-start{width:100%;padding:15px;background:var(--accent);color:white;border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(255,107,53,0.3);}
+.btn-start:hover:not(:disabled){background:#e55a28;transform:translateY(-1px);}
+.btn-start:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── SCREEN 2: LOADING ── */
+#screen-loading{align-items:center;justify-content:center;padding:2rem;}
+.loading-wrap{text-align:center;max-width:380px;animation:fadeIn .4s ease;}
+.loader-ring{width:80px;height:80px;margin:0 auto 2rem;position:relative;}
+.loader-ring::before,.loader-ring::after{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid transparent;}
+.loader-ring::before{border-top-color:var(--accent);animation:spin 1s linear infinite;}
+.loader-ring::after{border-bottom-color:rgba(255,107,53,0.2);animation:spin 1s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-title{font-size:22px;font-weight:800;margin-bottom:8px;}
+.loader-sub{font-size:14px;color:var(--text2);font-family:var(--font2);line-height:1.6;}
+.steps-list{margin-top:2rem;text-align:left;display:flex;flex-direction:column;gap:10px;}
+.step-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg2);border-radius:var(--r-sm);border:1px solid var(--border);font-size:14px;font-weight:600;color:var(--text3);transition:all .3s;}
+.step-item.done{color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.05);}
+.step-item.active{color:var(--accent);border-color:rgba(255,107,53,0.3);background:rgba(255,107,53,0.05);}
+.step-dot{width:22px;height:22px;border-radius:50%;background:var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;transition:all .3s;}
+.step-item.done .step-dot{background:var(--green);color:white;}
+.step-item.active .step-dot{background:var(--accent);color:white;animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+/* ── SCREEN 3: QUIZ ── */
+.quiz-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.quiz-logo{font-size:18px;font-weight:900;color:var(--accent);}
+.quiz-title-small{font-size:14px;font-weight:700;}
+.quiz-subtitle-small{font-size:12px;color:var(--text3);font-family:var(--font2);}
+.quiz-counter{font-size:14px;font-weight:700;color:var(--text2);}
+.quiz-progress-bar{height:4px;background:var(--bg3);}
+.quiz-progress-fill{height:100%;background:var(--accent);transition:width .5s ease;border-radius:0 2px 2px 0;}
+.quiz-body{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2.5rem 1.5rem;}
+.question-card{width:100%;max-width:640px;animation:slideUp .35s ease forwards;}
+.q-number{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-family:var(--font2);}
+.q-text-big{font-size:24px;font-weight:800;line-height:1.4;margin-bottom:2rem;}
+.type-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:20px;margin-bottom:1rem;}
+.badge-MCQ{background:rgba(139,92,246,0.1);color:var(--purple);}
+.badge-TrueFalse{background:rgba(59,130,246,0.1);color:var(--blue);}
+.badge-FillBlank{background:rgba(245,158,11,0.1);color:var(--amber);}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.option-btn{padding:16px 18px;border:2.5px solid var(--border);border-radius:var(--r);background:var(--bg2);font-family:var(--font);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
+.option-btn:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.1);}
+.option-letter{width:28px;height:28px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;transition:all .15s;}
+.option-btn.correct{border-color:var(--green);background:rgba(34,197,94,0.08);color:#166534;}
+.option-btn.correct .option-letter{background:var(--green);color:white;}
+.option-btn.wrong{border-color:var(--red);background:rgba(239,68,68,0.08);color:#991b1b;}
+.option-btn.wrong .option-letter{background:var(--red);color:white;}
+.option-btn.reveal{border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.04);}
+.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.tf-btn{padding:20px;border:2.5px solid var(--border);border-radius:var(--r);background:var(--bg2);font-family:var(--font);font-size:18px;font-weight:800;cursor:pointer;text-align:center;transition:all .15s;box-shadow:var(--shadow);}
+.tf-btn:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px);}
+.tf-btn.correct{border-color:var(--green);background:rgba(34,197,94,0.08);color:#166534;}
+.tf-btn.wrong{border-color:var(--red);background:rgba(239,68,68,0.08);color:#991b1b;}
+.tf-btn.reveal{border-color:rgba(34,197,94,0.4);}
+.fill-wrap{margin-bottom:1.5rem;}
+.fill-input{width:100%;padding:16px 20px;border:2.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:18px;font-weight:700;outline:none;transition:border-color .2s;background:var(--bg2);box-shadow:var(--shadow);}
+.fill-input:focus{border-color:var(--accent);}
+.fill-input.correct{border-color:var(--green);background:rgba(34,197,94,0.06);color:#166534;}
+.fill-input.wrong{border-color:var(--red);background:rgba(239,68,68,0.06);color:#991b1b;}
+.fill-submit{margin-top:10px;width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;}
+.fill-submit:hover:not(:disabled){background:#e55a28;}
+.fill-submit:disabled{opacity:.4;cursor:not-allowed;}
+.feedback-banner{padding:14px 18px;border-radius:var(--r-sm);margin-bottom:1.5rem;display:none;animation:slideUp .25s ease;}
+.feedback-banner.show{display:flex;align-items:flex-start;gap:12px;}
+.feedback-banner.correct-fb{background:rgba(34,197,94,0.1);border:1.5px solid rgba(34,197,94,0.3);}
+.feedback-banner.wrong-fb{background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.3);}
+.fb-icon{font-size:22px;flex-shrink:0;line-height:1;}
+.fb-title{font-size:15px;font-weight:800;margin-bottom:2px;}
+.fb-correct-title{color:#166534;}
+.fb-wrong-title{color:#991b1b;}
+.fb-sub{font-size:13px;color:var(--text2);font-family:var(--font2);}
+.btn-next{width:100%;padding:15px;background:var(--text);color:white;border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;display:none;}
+.btn-next.show{display:block;}
+.btn-next:hover{background:#333;transform:translateY(-1px);}
+
+/* ── SCREEN 4: RESULTS ── */
+#screen-results{align-items:center;justify-content:flex-start;padding:2rem 1.5rem 4rem;overflow-y:auto;}
+.results-wrap{width:100%;max-width:640px;margin:0 auto;animation:slideUp .5s ease forwards;}
+.result-hero{background:var(--bg2);border-radius:24px;padding:2.5rem;text-align:center;margin-bottom:1.5rem;border:1px solid var(--border);box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+.result-emoji{font-size:56px;margin-bottom:12px;display:block;}
+.result-score{font-size:64px;font-weight:900;line-height:1;margin-bottom:4px;}
+.result-hero.excellent .result-score{color:var(--green);}
+.result-hero.good .result-score{color:var(--blue);}
+.result-hero.fair .result-score{color:var(--amber);}
+.result-hero.poor .result-score{color:var(--red);}
+.result-label{font-size:20px;font-weight:800;margin-bottom:6px;}
+.result-sub-label{font-size:14px;color:var(--text2);font-family:var(--font2);margin-bottom:1.5rem;}
+.score-pills{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.score-pill{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;border:1.5px solid;}
+.pill-correct{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#166534;}
+.pill-wrong{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#991b1b;}
+.pill-total{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#1e40af;}
+.section-title{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:1rem;font-family:var(--font2);}
+.review-list{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem;}
+.review-item{background:var(--bg2);border-radius:var(--r);padding:1.25rem;border:1.5px solid var(--border);box-shadow:var(--shadow);animation:fadeIn .4s ease both;}
+.review-item.r-correct{border-left:4px solid var(--green);}
+.review-item.r-wrong{border-left:4px solid var(--red);}
+.review-q{font-size:15px;font-weight:700;margin-bottom:10px;line-height:1.4;}
+.review-answers{display:flex;gap:8px;flex-wrap:wrap;}
+.review-tag{font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;font-family:var(--font2);}
+.tag-your-correct{background:rgba(34,197,94,0.1);color:#166534;}
+.tag-your-wrong{background:rgba(239,68,68,0.1);color:#991b1b;}
+.tag-correct-ans{background:rgba(59,130,246,0.1);color:#1e40af;}
+.topic-section{background:var(--bg2);border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem;border:1px solid var(--border);box-shadow:var(--shadow);}
+.topic-breakdown{display:flex;flex-direction:column;gap:12px;}
+.topic-row{display:flex;align-items:center;gap:12px;}
+.topic-name-r{font-size:14px;font-weight:700;min-width:90px;}
+.topic-bar-r{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.topic-fill-r{height:100%;border-radius:4px;transition:width .8s ease;}
+.topic-pct{font-size:13px;font-weight:700;min-width:36px;text-align:right;}
+.btn-retake{width:100%;padding:15px;background:var(--accent);color:white;border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:10px;box-shadow:0 4px 16px rgba(255,107,53,0.3);}
+.btn-retake:hover{background:#e55a28;transform:translateY(-1px);}
+.btn-new{width:100%;padding:14px;background:transparent;color:var(--text);border:2px solid var(--border);border-radius:var(--r-sm);font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-new:hover{border-color:var(--text);background:var(--bg3);}
+.confetti-piece{position:fixed;width:10px;height:10px;top:-20px;border-radius:2px;animation:confettiFall linear forwards;pointer-events:none;z-index:9999;}
+@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: UPLOAD -->
+<div class="screen active" id="screen-upload">
+  <div class="upload-wrap">
+    <div class="logo-wrap">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="logo-name">Peblo</div>
+      <div class="logo-tagline">Upload a PDF. Get a quiz. Learn instantly.</div>
+    </div>
+    <div class="upload-card">
+      <h2>Start your quiz</h2>
+      <p>Enter your name, upload any educational PDF and we'll generate a personalised quiz for you.</p>
+      <div class="name-row">
+        <input type="text" id="studentName" placeholder="Your name" maxlength="30">
+      </div>
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"/></svg>
+        </div>
+        <div class="drop-title">Drop your PDF here</div>
+        <div class="drop-sub">or <span>browse files</span></div>
+        <input type="file" id="fileInput" accept=".pdf" onchange="onFileChosen(this)">
+      </div>
+      <div class="file-chosen" id="fileChosen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span id="fileName">—</span>
+      </div>
+      <button class="btn-start" id="btnStart" onclick="startFlow()" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Generate My Quiz
+      </button>
+      <div style="margin-top:1rem;font-size:12px;color:var(--text3);text-align:center;font-family:var(--font2)">Powered by AI — all questions extracted from your PDF</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: LOADING -->
+<div class="screen" id="screen-loading">
+  <div class="loading-wrap">
+    <div class="loader-ring"></div>
+    <div class="loader-title">Preparing your quiz…</div>
+    <div class="loader-sub" id="loaderSub">Our AI is reading your PDF and extracting all questions.</div>
+    <div class="steps-list">
+      <div class="step-item" id="step-1"><div class="step-dot">1</div><span>Uploading & reading PDF</span></div>
+      <div class="step-item" id="step-2"><div class="step-dot">2</div><span>Extracting all content</span></div>
+      <div class="step-item" id="step-3"><div class="step-dot">3</div><span id="step3Label">Generating all questions with AI</span></div>
+      <div class="step-item" id="step-4"><div class="step-dot">4</div><span id="step4Label">Loading your quiz</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-header">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="quiz-logo">Peblo</span>
+      <div>
+        <div class="quiz-title-small" id="quizTitle">Quiz</div>
+        <div class="quiz-subtitle-small" id="quizStudentName"></div>
+      </div>
+    </div>
+    <div class="quiz-counter" id="quizCounter">1 / ?</div>
+  </div>
+  <div class="quiz-progress-bar">
+    <div class="quiz-progress-fill" id="quizProgressFill" style="width:0%"></div>
+  </div>
+  <div class="quiz-body">
+    <div class="question-card" id="questionCard"></div>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div class="screen" id="screen-results">
+  <div class="results-wrap" id="resultsWrap"></div>
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+let studentName = "Student";
+let studentId   = "";
+let sourceId    = "";
+let questions   = [];
+let current     = 0;
+let answers     = [];
+let chosenFile  = null;
+
+// ── File handling ─────────────────────────────────────────────────────────
+function onFileChosen(input) {
+  chosenFile = input.files[0];
+  if (!chosenFile) return;
+  document.getElementById("fileName").textContent = chosenFile.name;
+  document.getElementById("fileChosen").classList.add("show");
+  checkStartable();
+}
+
+const dz = document.getElementById("dropZone");
+dz.addEventListener("dragover",  e => { e.preventDefault(); dz.classList.add("drag-over"); });
+dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+dz.addEventListener("drop", e => {
+  e.preventDefault(); dz.classList.remove("drag-over");
+  const f = e.dataTransfer.files[0];
+  if (f && f.name.endsWith(".pdf")) {
+    chosenFile = f;
+    document.getElementById("fileName").textContent = f.name;
+    document.getElementById("fileChosen").classList.add("show");
+    checkStartable();
+  }
+});
+
+document.getElementById("studentName").addEventListener("input", checkStartable);
+
+function checkStartable() {
+  const name = document.getElementById("studentName").value.trim();
+  document.getElementById("btnStart").disabled = !(name && chosenFile);
+}
+
+function setStep(n, state) {
+  const el = document.getElementById(`step-${n}`);
+  el.className = `step-item ${state}`;
+  if (state === "done") el.querySelector(".step-dot").textContent = "✓";
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Main flow ─────────────────────────────────────────────────────────────
+async function startFlow() {
+  studentName = document.getElementById("studentName").value.trim() || "Student";
+  studentId   = "user_" + studentName.toLowerCase().replace(/\s+/g,"_") + "_" + Date.now();
+
+  showScreen("loading");
+  setStep(1, "active");
+
+  try {
+    // ── Step 1: Ingest PDF — creates 1 chunk (entire PDF) ──
+    const form = new FormData();
+    form.append("file", chosenFile);
+    const r1 = await fetch(`${API}/ingest`, { method:"POST", body:form });
+    if (!r1.ok) {
+      const e = await r1.json();
+      throw new Error(e.detail || "Failed to read PDF");
+    }
+    const d1 = await r1.json();
+    sourceId = d1.source_id;
+    setStep(1,"done"); setStep(2,"active");
+
+    await delay(400);
+    setStep(2,"done"); setStep(3,"active");
+
+    // ── Step 2: Send entire PDF to LLM — extract ALL questions ──
+    const r2 = await fetch(`${API}/generate-quiz`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ source_id: sourceId, questions_per_chunk: 1 })
+    });
+    if (!r2.ok) {
+      const e = await r2.json();
+      throw new Error(e.detail || "Failed to generate questions");
+    }
+    const d2 = await r2.json();
+
+    const generated = d2.questions_generated;
+    const skipped   = d2.duplicates_skipped;
+    document.getElementById("step3Label").textContent =
+      `Generated ${generated} questions${skipped > 0 ? ` (${skipped} duplicates removed)` : ""}`;
+
+    setStep(3,"done"); setStep(4,"active");
+
+    // ── Step 3: Fetch ALL questions for this PDF using source_id ──
+    // GET /quiz?source_id=... returns ONLY this PDF's questions, all of them
+    const r3 = await fetch(`${API}/quiz?source_id=${sourceId}`);
+    if (!r3.ok) {
+      const e = await r3.json();
+      throw new Error(e.detail || "Failed to fetch questions");
+    }
+    const d3 = await r3.json();
+
+    if (d3.total === 0) {
+      throw new Error(
+        "No questions were generated.\n\n" +
+        "Please check:\n" +
+        "1. Your .env LLM_API_KEY is set correctly\n" +
+        "2. The backend terminal shows no errors\n" +
+        "3. The PDF contains readable text"
+      );
+    }
+
+    document.getElementById("step4Label").textContent = `Loaded ${d3.total} questions — let's go!`;
+
+    questions = d3.questions.sort(() => Math.random() - 0.5);
+    answers   = [];
+    current   = 0;
+
+    setStep(4,"done");
+    await delay(500);
+    startQuiz();
+
+  } catch(e) {
+    showScreen("upload");
+    alert("Something went wrong:\n\n" + e.message);
+  }
+}
+
+// ── Quiz ──────────────────────────────────────────────────────────────────
+function startQuiz() {
+  document.getElementById("quizTitle").textContent       = chosenFile.name.replace(".pdf","").replace(/_/g," ");
+  document.getElementById("quizStudentName").textContent = `Hi, ${studentName}!`;
+  showScreen("quiz");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q   = questions[current];
+  const pct = (current / questions.length) * 100;
+  document.getElementById("quizProgressFill").style.width = pct + "%";
+  document.getElementById("quizCounter").textContent      = `${current + 1} / ${questions.length}`;
+
+  let typeLabel = q.type === "FillBlank" ? "Fill in the blank"
+                : q.type === "TrueFalse" ? "True / False"
+                : "Multiple choice";
+  let optionsHtml = "";
+
+  if (q.type === "MCQ" && q.options) {
+    const letters = ["A","B","C","D"];
+    optionsHtml = `<div class="options-grid">
+      ${q.options.map((opt,i) => `
+        <button class="option-btn" id="opt-${i}"
+          onclick="submitMCQ('${q.question_id}','${esc(opt)}',${i})">
+          <span class="option-letter">${letters[i]}</span>${opt}
+        </button>`).join("")}
+    </div>`;
+  } else if (q.type === "TrueFalse") {
+    optionsHtml = `<div class="tf-grid">
+      <button class="tf-btn" id="opt-true"  onclick="submitMCQ('${q.question_id}','True','true')">True</button>
+      <button class="tf-btn" id="opt-false" onclick="submitMCQ('${q.question_id}','False','false')">False</button>
+    </div>`;
+  } else {
+    const iid = `fill-${q.question_id}`;
+    optionsHtml = `<div class="fill-wrap">
+      <input class="fill-input" id="${iid}" type="text" placeholder="Type your answer here…"
+        onkeydown="if(event.key==='Enter') submitFill('${q.question_id}')">
+      <button class="fill-submit" id="fillSubmit"
+        onclick="submitFill('${q.question_id}')">Submit Answer</button>
+    </div>`;
+  }
+
+  document.getElementById("questionCard").innerHTML = `
+    <div class="q-number">Question ${current + 1} of ${questions.length}</div>
+    <div style="margin-bottom:8px">
+      <span class="type-badge badge-${q.type}">${typeLabel}</span>
+    </div>
+    <div class="q-text-big">${q.question}</div>
+    ${optionsHtml}
+    <div class="feedback-banner" id="feedbackBanner"></div>
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">
+      ${current === questions.length - 1 ? "See My Results →" : "Next Question →"}
+    </button>`;
+
+  if (q.type === "FillBlank") setTimeout(() => document.getElementById(`fill-${q.question_id}`)?.focus(), 100);
+}
+
+function esc(s) { return String(s).replace(/'/g,"\\'").replace(/"/g,"&quot;"); }
+
+async function submitMCQ(qId, selected, btnIdx) {
+  const q = questions[current];
+  document.querySelectorAll(".option-btn,.tf-btn").forEach(b => b.disabled = true);
+  const res = await callSubmit(qId, selected);
+  if (!res) return;
+
+  if (q.type === "MCQ") {
+    q.options.forEach((opt,i) => {
+      const btn = document.getElementById(`opt-${i}`);
+      if (!btn) return;
+      if (opt === q.answer) btn.classList.add("correct");
+      else if (i == btnIdx && !res.correct) btn.classList.add("wrong");
+    });
+  } else {
+    const tb = document.getElementById("opt-true");
+    const fb = document.getElementById("opt-false");
+    (q.answer === "True" ? tb : fb).classList.add("correct");
+    if (!res.correct) (selected === "True" ? tb : fb).classList.add("wrong");
+  }
+  showFeedback(res.correct, res.correct_answer, res.message);
+  recordAnswer(q, selected, res.correct, res.correct_answer);
+}
+
+async function submitFill(qId) {
+  const input    = document.getElementById(`fill-${qId}`);
+  const selected = input.value.trim();
+  if (!selected) return;
+  document.getElementById("fillSubmit").disabled = true;
+  input.disabled = true;
+  const res = await callSubmit(qId, selected);
+  if (!res) return;
+  input.classList.add(res.correct ? "correct" : "wrong");
+  showFeedback(res.correct, res.correct_answer, res.message);
+  recordAnswer(questions[current], selected, res.correct, res.correct_answer);
+}
+
+async function callSubmit(qId, selected) {
+  try {
+    const r = await fetch(`${API}/submit-answer`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: studentId, question_id: qId, selected_answer: selected })
+    });
+    return await r.json();
+  } catch { return null; }
+}
+
+function showFeedback(isCorrect, correctAnswer, message) {
+  const banner = document.getElementById("feedbackBanner");
+  banner.className = `feedback-banner show ${isCorrect ? "correct-fb" : "wrong-fb"}`;
+  banner.innerHTML = isCorrect
+    ? `<div class="fb-icon">🎉</div>
+       <div><div class="fb-title fb-correct-title">Correct!</div>
+       <div class="fb-sub">${message}</div></div>`
+    : `<div class="fb-icon">💡</div>
+       <div><div class="fb-title fb-wrong-title">Not quite!</div>
+       <div class="fb-sub">${message}</div></div>`;
+  document.getElementById("btnNext").classList.add("show");
+}
+
+function recordAnswer(q, selected, isCorrect, correctAnswer) {
+  answers.push({ question: q.question, selected, isCorrect, correctAnswer, topic: q.topic || "General", type: q.type });
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) showResults();
+  else { renderQuestion(); window.scrollTo({ top:0, behavior:"smooth" }); }
+}
+
+// ── Results ───────────────────────────────────────────────────────────────
+function showResults() {
+  showScreen("results");
+  const total   = answers.length;
+  const correct = answers.filter(a => a.isCorrect).length;
+  const pct     = total > 0 ? Math.round(correct / total * 100) : 0;
+
+  let grade, emoji, heroClass;
+  if (pct >= 90)      { grade="Excellent!";   emoji="🏆"; heroClass="excellent"; }
+  else if (pct >= 70) { grade="Well done!";   emoji="⭐"; heroClass="good"; }
+  else if (pct >= 50) { grade="Good effort!"; emoji="👍"; heroClass="fair"; }
+  else                { grade="Keep going!";  emoji="💪"; heroClass="poor"; }
+
+  if (pct >= 70) launchConfetti();
+
+  const topicMap = {};
+  answers.forEach(a => {
+    if (!topicMap[a.topic]) topicMap[a.topic] = { correct:0, total:0 };
+    topicMap[a.topic].total++;
+    if (a.isCorrect) topicMap[a.topic].correct++;
+  });
+
+  const topicRows = Object.entries(topicMap).map(([topic, data]) => {
+    const tp    = Math.round(data.correct / data.total * 100);
+    const color = tp >= 70 ? "var(--green)" : tp >= 50 ? "var(--amber)" : "var(--red)";
+    return `<div class="topic-row">
+      <div class="topic-name-r">${topic}</div>
+      <div class="topic-bar-r"><div class="topic-fill-r" style="width:${tp}%;background:${color}"></div></div>
+      <div class="topic-pct" style="color:${color}">${tp}%</div>
+    </div>`;
+  }).join("");
+
+  const reviewItems = answers.map((a,i) => `
+    <div class="review-item ${a.isCorrect?'r-correct':'r-wrong'}" style="animation-delay:${i*.05}s">
+      <div class="review-q">${i+1}. ${a.question}</div>
+      <div class="review-answers">
+        <span class="review-tag ${a.isCorrect?'tag-your-correct':'tag-your-wrong'}">
+          Your answer: ${a.selected}
+        </span>
+        ${!a.isCorrect ? `<span class="review-tag tag-correct-ans">Correct: ${a.correctAnswer}</span>` : ""}
+      </div>
+    </div>`).join("");
+
+  document.getElementById("resultsWrap").innerHTML = `
+    <div class="result-hero ${heroClass}">
+      <span class="result-emoji">${emoji}</span>
+      <div class="result-score">${pct}%</div>
+      <div class="result-label">${grade}</div>
+      <div class="result-sub-label">You answered ${correct} out of ${total} questions correctly, ${studentName}.</div>
+      <div class="score-pills">
+        <span class="score-pill pill-correct">✓ ${correct} correct</span>
+        <span class="score-pill pill-wrong">✗ ${total-correct} wrong</span>
+        <span class="score-pill pill-total">${total} total</span>
+      </div>
+    </div>
+    ${Object.keys(topicMap).length > 1 ? `
+    <div class="topic-section">
+      <div class="section-title">Performance by topic</div>
+      <div class="topic-breakdown">${topicRows}</div>
+    </div>` : ""}
+    <div class="section-title">Question review</div>
+    <div class="review-list">${reviewItems}</div>
+    <button class="btn-retake" onclick="retakeQuiz()">Retake Quiz</button>
+    <button class="btn-new"    onclick="newQuiz()">Upload a New PDF</button>`;
+
+  setTimeout(() => {
+    document.querySelectorAll(".topic-fill-r").forEach(el => {
+      const w = el.style.width; el.style.width="0";
+      setTimeout(() => el.style.width = w, 100);
+    });
+  }, 200);
+}
+
+function retakeQuiz() {
+  answers  = [];
+  current  = 0;
+  questions = questions.sort(() => Math.random() - 0.5);
+  showScreen("quiz");
+  renderQuestion();
+}
+
+function newQuiz() {
+  chosenFile = null; questions = []; answers = []; current = 0; sourceId = "";
+  document.getElementById("fileInput").value = "";
+  document.getElementById("fileChosen").classList.remove("show");
+  document.getElementById("btnStart").disabled = true;
+  document.getElementById("studentName").value = "";
+  for (let i=1;i<=4;i++) {
+    const el = document.getElementById(`step-${i}`);
+    el.className = "step-item";
+    el.querySelector(".step-dot").textContent = i;
+  }
+  document.getElementById("step3Label").textContent = "Generating all questions with AI";
+  document.getElementById("step4Label").textContent = "Loading your quiz";
+  showScreen("upload");
+}
+
+function launchConfetti() {
+  const colors = ["#ff6b35","#22c55e","#3b82f6","#f59e0b","#8b5cf6","#ec4899"];
+  for (let i=0; i<80; i++) {
+    setTimeout(() => {
+      const el = document.createElement("div");
+      el.className = "confetti-piece";
+      el.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.5}s;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }, i * 20);
+  }
+}
+
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(`screen-${name}`).classList.add("active");
+  window.scrollTo({ top:0 });
+}
+</script>
+</body>
+</html>

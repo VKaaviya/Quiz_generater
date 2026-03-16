@@ -1,0 +1,109 @@
+{
+  "sample_ingest_response": {
+    "source_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "filename": "peblo_pdf_grade1_math_numbers.pdf",
+    "grade": 1,
+    "subject": "Math",
+    "total_chunks": 5,
+    "chunks": [
+      {
+        "chunk_id": "c1d2e3f4-1234-5678-abcd-000000000001",
+        "source_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "chunk_index": 0,
+        "topic": "Shapes",
+        "text": "A triangle has three sides and three corners. A square has four equal sides and four corners. A circle is round and has no corners or straight sides..."
+      }
+    ]
+  },
+
+  "sample_generate_quiz_response": {
+    "source_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "questions_generated": 12,
+    "duplicates_skipped": 2
+  },
+
+  "sample_quiz_response": {
+    "total": 3,
+    "questions": [
+      {
+        "question_id": "q1a2b3c4-0001-0001-0001-000000000001",
+        "question": "How many sides does a triangle have?",
+        "type": "MCQ",
+        "options": ["2", "3", "4", "5"],
+        "answer": "3",
+        "difficulty": "easy",
+        "topic": "Shapes",
+        "source_chunk_id": "c1d2e3f4-1234-5678-abcd-000000000001"
+      },
+      {
+        "question_id": "q1a2b3c4-0001-0001-0001-000000000002",
+        "question": "A triangle has ___ sides.",
+        "type": "FillBlank",
+        "options": null,
+        "answer": "three",
+        "difficulty": "easy",
+        "topic": "Shapes",
+        "source_chunk_id": "c1d2e3f4-1234-5678-abcd-000000000001"
+      },
+      {
+        "question_id": "q1a2b3c4-0001-0001-0001-000000000003",
+        "question": "A circle has no corners or straight sides.",
+        "type": "TrueFalse",
+        "options": ["True", "False"],
+        "answer": "True",
+        "difficulty": "easy",
+        "topic": "Shapes",
+        "source_chunk_id": "c1d2e3f4-1234-5678-abcd-000000000001"
+      }
+    ]
+  },
+
+  "sample_submit_answer_request": {
+    "student_id": "S001",
+    "question_id": "q1a2b3c4-0001-0001-0001-000000000001",
+    "selected_answer": "3"
+  },
+
+  "sample_submit_answer_response": {
+    "correct": true,
+    "correct_answer": "3",
+    "next_difficulty": "easy",
+    "streak": 1,
+    "accuracy": 100.0,
+    "message": "Correct — 2 more in a row to advance"
+  },
+
+  "sample_progress_response": {
+    "student_id": "S001",
+    "topics": [
+      {
+        "topic": "Shapes",
+        "level": 1,
+        "difficulty": "medium",
+        "streak": 1,
+        "total": 8,
+        "correct": 6,
+        "accuracy": 75.0
+      },
+      {
+        "topic": "Grammar",
+        "level": 0,
+        "difficulty": "easy",
+        "streak": -1,
+        "total": 4,
+        "correct": 1,
+        "accuracy": 25.0
+      }
+    ]
+  },
+
+  "database_schema": {
+    "tables": {
+      "sources":              ["source_id PK", "filename", "grade", "subject", "total_chunks", "created_at"],
+      "chunks":               ["chunk_id PK", "source_id FK", "chunk_index", "topic", "text", "created_at"],
+      "questions":            ["question_id PK", "source_chunk_id FK", "topic", "subject", "grade", "question_text", "question_type", "options JSON", "answer", "difficulty", "embedding JSON", "created_at"],
+      "student_topic_state":  ["student_id PK", "topic PK", "level", "streak", "total", "correct", "updated_at"],
+      "student_answers":      ["answer_id PK", "student_id", "question_id FK", "selected_answer", "is_correct", "difficulty_at", "submitted_at"]
+    }
+  }
+}
